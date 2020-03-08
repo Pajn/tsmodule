@@ -64,6 +64,7 @@ function buildTs() {
         appTsConfig.compilerOptions.allowJs ? tsPaths.concat(jsPaths) : tsPaths
       )
       .pipe(plumber())
+      .pipe(changedInPlace({ firstPass: true }))
       .pipe(sourcemaps.init())
       .pipe(
         (tsProject ||
@@ -73,7 +74,6 @@ function buildTs() {
       );
 
     const babelPipe = tsStream.js
-      .pipe(changedInPlace({ firstPass: true }))
       .pipe(
         babel({
           babelrc: false,
@@ -92,6 +92,7 @@ function buildTs() {
           ],
         })
       )
+      .pipe(sourcemaps.write('.'))
       .on('error', errorHandler);
 
     const primaryStream = merge([
@@ -108,7 +109,6 @@ function buildTs() {
       const cjsStream = merge([
         tsStream.js
           .pipe(clone())
-          .pipe(changedInPlace({ firstPass: true }))
           .pipe(
             babel({
               babelrc: false,
